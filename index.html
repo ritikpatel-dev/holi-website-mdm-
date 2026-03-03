@@ -24,6 +24,7 @@ body{
     animation: gradientBG 10s ease infinite;
 }
 
+/* Background animation */
 @keyframes gradientBG {
     0%{background-position:0% 50%}
     50%{background-position:100% 50%}
@@ -33,6 +34,7 @@ body{
 .container{
     text-align:center;
     color:white;
+    z-index:2;
 }
 
 h1{
@@ -70,18 +72,36 @@ button:hover{
     transform:scale(1.1);
 }
 
-.color{
+/* Image + Greeting Section */
+.holi-special{
     position:absolute;
-    width:20px;
-    height:20px;
-    border-radius:50%;
-    pointer-events:none;
-    animation: fall 4s linear forwards;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%) scale(0);
+    text-align:center;
+    opacity:0;
+    transition:0.8s ease;
+    z-index:3;
 }
 
-@keyframes fall{
-    0%{ transform:translateY(0) scale(1); opacity:1;}
-    100%{ transform:translateY(100vh) scale(0.3); opacity:0;}
+.holi-special.show{
+    transform:translate(-50%,-50%) scale(1);
+    opacity:1;
+}
+
+.holi-special img{
+    width:260px;
+    border-radius:20px;
+    box-shadow:0 0 40px white;
+    margin-bottom:20px;
+}
+
+.special-text{
+    font-size:42px;
+    font-weight:bold;
+    color:white;
+    text-shadow:0 0 20px #fff, 0 0 40px #ff00cc;
+    animation: glow 2s infinite alternate;
 }
 
 .footer{
@@ -89,6 +109,15 @@ button:hover{
     bottom:20px;
     font-size:16px;
     color:white;
+}
+
+/* Powder particle */
+.powder{
+    position:absolute;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    pointer-events:none;
 }
 </style>
 </head>
@@ -101,30 +130,62 @@ button:hover{
     <button onclick="burstColors()">Throw Colors 🎨</button>
 </div>
 
+<!-- Hidden Image + Text -->
+<div class="holi-special" id="special">
+    <img src="lezhil.png" alt="Holi Special Image">
+    <div class="special-text">Happy Holi MDM 🎉</div>
+</div>
+
 <div class="footer">
     Made with ❤️ for Holi Festival
 </div>
 
 <script>
+
 function burstColors(){
-    for(let i=0; i<60; i++){
-        let color = document.createElement("div");
-        color.classList.add("color");
 
-        let colors = ["#ff4e50","#fc913a","#f9d423","#24c6dc","#514a9d","#ff00cc","#00ffcc"];
-        color.style.background = colors[Math.floor(Math.random()*colors.length)];
+    // Create blasts from multiple directions
+    createBlast(window.innerWidth/2, window.innerHeight/2); // Center
+    createBlast(0, window.innerHeight/2); // Left
+    createBlast(window.innerWidth/2, 0); // Top
 
-        color.style.left = Math.random()*window.innerWidth + "px";
-        color.style.top = "0px";
+    // Show Image + Greeting
+    document.getElementById("special").classList.add("show");
+}
 
-        color.style.width = Math.random()*20 + 10 + "px";
-        color.style.height = color.style.width;
+function createBlast(originX, originY){
 
-        document.body.appendChild(color);
+    let colors = ["#ff4e50","#fc913a","#f9d423","#24c6dc","#514a9d","#ff00cc","#00ffcc"];
 
-        setTimeout(()=>{ color.remove(); },4000);
+    for(let i=0; i<150; i++){
+
+        let powder = document.createElement("div");
+        powder.classList.add("powder");
+
+        powder.style.background = colors[Math.floor(Math.random()*colors.length)];
+        powder.style.left = originX + "px";
+        powder.style.top = originY + "px";
+
+        document.body.appendChild(powder);
+
+        let angle = Math.random()*2*Math.PI;
+        let distance = Math.random()*500 + 100;
+
+        let x = Math.cos(angle)*distance;
+        let y = Math.sin(angle)*distance;
+
+        powder.animate([
+            { transform: "translate(0,0) scale(1)", opacity:1 },
+            { transform: `translate(${x}px,${y}px) scale(2)`, opacity:0 }
+        ],{
+            duration: 2200,
+            easing: "ease-out"
+        });
+
+        setTimeout(()=> powder.remove(),2200);
     }
 }
+
 </script>
 
 </body>
